@@ -6,6 +6,8 @@ import Profile from "./routes/Profile";
 import Login from "./routes/Login";
 import reset from "styled-reset";
 import Register from "./routes/Register";
+import { useEffect, useState } from "react";
+import LoadingScreen from "./components/LoadingScreen";
 
 const router = createBrowserRouter([
   {
@@ -47,10 +49,20 @@ body{
 `;
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const init = async () => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
   return (
     <>
       <GlobalStyles />
-      <RouterProvider router={router} />
+      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
     </>
   );
 }
