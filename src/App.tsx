@@ -8,6 +8,7 @@ import reset from "styled-reset";
 import Register from "./routes/Register";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/LoadingScreen";
+import { auth } from "./firebase/firebase";
 
 const router = createBrowserRouter([
   {
@@ -51,9 +52,8 @@ body{
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const init = async () => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    await auth.authStateReady();
+    setIsLoading(false);
   };
 
   useEffect(() => {
