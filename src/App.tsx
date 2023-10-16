@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import Layout from "./components/Layout";
 import Home from "./routes/Home";
 import Profile from "./routes/Profile";
@@ -9,6 +9,12 @@ import Register from "./routes/Register";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/LoadingScreen";
 import { auth } from "./firebase/firebase";
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
 
 const router = createBrowserRouter([
   {
@@ -60,10 +66,10 @@ function App() {
     init();
   }, []);
   return (
-    <>
+    <Wrapper>
       <GlobalStyles />
       {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    </>
+    </Wrapper>
   );
 }
 
