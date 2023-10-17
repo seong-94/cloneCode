@@ -2,7 +2,8 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -17,6 +18,7 @@ const Title = styled.h1`
 `;
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -40,6 +42,13 @@ const Error = styled.span`
   font-weight: 600;
   color: red;
 `;
+const Switcher = styled.span`
+  margin-top: 20px;
+  a {
+    text-decoration: none;
+  }
+`;
+
 type Props = {};
 
 export default function Register({}: Props) {
@@ -68,15 +77,17 @@ export default function Register({}: Props) {
     if (isLoading || name === "" || email === "" || password === "") return;
     try {
       setIsLoading(true);
+      setError("");
       const credentials = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(credentials.user);
 
       await updateProfile(credentials.user, {
         displayName: name,
       });
       navigate("/");
-    } catch (err) {
-      console.log(err);
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        setError(e.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +124,10 @@ export default function Register({}: Props) {
         <Input type="submit" value={isLoading ? "Loading..." : "Create Account"} />
       </Form>
       {error !== "" ? <Error>{error}</Error> : ""}
+      <Switcher>
+        <Link to="/login">아이디가 있으면</Link>
+        로그인 하기
+      </Switcher>
     </Wrapper>
   );
 }

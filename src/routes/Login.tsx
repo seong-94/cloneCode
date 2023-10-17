@@ -1,5 +1,13 @@
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components";
+import { auth } from "../firebase";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -14,6 +22,7 @@ const Title = styled.h1`
 `;
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -37,11 +46,17 @@ const Error = styled.span`
   font-weight: 600;
   color: red;
 `;
+const Switcher = styled.span`
+  margin-top: 20px;
+  a {
+    text-decoration: none;
+  }
+`;
 type Props = {};
 
 export default function Login({}: Props) {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -50,35 +65,34 @@ export default function Login({}: Props) {
     const {
       target: { name, value },
     } = e;
-    if (name === "name") {
-      setName(value);
-    } else if (name === "password") {
+    if (name === "password") {
       setPassword(value);
     } else if (name === "email") {
       setEmail(value);
     }
   };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading || email === "" || password === "") return;
     try {
-    } catch (err) {
+      setIsLoading(true);
+      setError("");
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/");
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        setError(e.message);
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <Wrapper>
       <Title>Log into ✖</Title>
       <Form onSubmit={onSubmit}>
-        <Input
-          onChange={onChange}
-          type="text"
-          value={name}
-          name="name"
-          placeholder="이름"
-          required
-        />
         <Input
           onChange={onChange}
           type="email"
@@ -98,6 +112,10 @@ export default function Login({}: Props) {
         <Input type="submit" value={isLoading ? "Loading..." : "Create Account"} />
       </Form>
       {error !== "" ? <Error>{error}</Error> : ""}
+      <Switcher>
+        아이디가 없으면
+        <Link to="/register"> 아이디 생성하기</Link>
+      </Switcher>
     </Wrapper>
   );
 }
