@@ -13,9 +13,11 @@ const Wrapper = styled.div`
   width: 420px;
   padding: 50px 0px;
 `;
+
 const Title = styled.h1`
   font-size: 42px;
 `;
+
 const Form = styled.form`
   margin-top: 50px;
   margin-bottom: 10px;
@@ -24,12 +26,14 @@ const Form = styled.form`
   gap: 10px;
   width: 100%;
 `;
+
 const Input = styled.input`
   width: 100%;
   padding: 10px 20px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
+
   &[type="submit"] {
     cursor: pointer;
     &:hover {
@@ -42,51 +46,64 @@ const Error = styled.span`
   font-weight: 600;
   color: red;
 `;
+
 const Switcher = styled.span`
   margin-top: 20px;
+
   a {
     text-decoration: none;
   }
 `;
 
-type Props = {};
+type FormData = {
+  name: string;
+  email: string;
+  password: string;
+  error: string;
+};
 
-export default function Register({}: Props) {
+// 입력 필드 정보를 배열로 선언
+const fields = [
+  { type: "text", name: "name", placeholder: "이름", label: "Name" },
+  { type: "email", name: "email", placeholder: "이메일", label: "Email" },
+  { type: "password", name: "password", placeholder: "비밀번호", label: "Password" },
+];
+
+export default function Register() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+    error: "",
+  });
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      target: { name, value },
-    } = e;
-    if (name === "name") {
-      setName(value);
-    } else if (name === "password") {
-      setPassword(value);
-    } else if (name === "email") {
-      setEmail(value);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value, error: "" });
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const { name, email, password } = formData;
+
     if (isLoading || name === "" || email === "" || password === "") return;
+
     try {
       setIsLoading(true);
-      setError("");
+      setFormData({ ...formData, error: "" });
+
       const credentials = await createUserWithEmailAndPassword(auth, email, password);
 
       await updateProfile(credentials.user, {
         displayName: name,
       });
+
       navigate("/");
     } catch (e) {
       if (e instanceof FirebaseError) {
-        setError(e.message);
+        setFormData({ ...formData, error: e.message });
       }
     } finally {
       setIsLoading(false);
@@ -96,37 +113,25 @@ export default function Register({}: Props) {
   return (
     <Wrapper>
       <Title>Log into ✖</Title>
-      <Form onSubmit={onSubmit}>
-        <Input
-          onChange={onChange}
-          type="text"
-          value={name}
-          name="name"
-          placeholder="이름"
-          required
-        />
-        <Input
-          onChange={onChange}
-          type="email"
-          value={email}
-          name="email"
-          placeholder="이메일"
-          required
-        />
-        <Input
-          onChange={onChange}
-          type="password"
-          value={password}
-          name="password"
-          placeholder="비밀번호"
-          required
-        />
+      <Form onSubmit={handleSubmit}>
+        {fields.map((field, index) => (
+          <div key={index}>
+            <label htmlFor={field.name}>{field.label}</label>
+            <Input
+              type={field.type}
+              value={formData[field.name as keyof FormData]}
+              name={field.name}
+              placeholder={field.placeholder}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        ))}
         <Input type="submit" value={isLoading ? "Loading..." : "Create Account"} />
       </Form>
-      {error !== "" ? <Error>{error}</Error> : ""}
+      {formData.error && <Error>{formData.error}</Error>}
       <Switcher>
-        <Link to="/login">아이디가 있으면</Link>
-        로그인 하기
+        <Link to="/login">아이디가 있으면</Link> 로그인 하기
       </Switcher>
     </Wrapper>
   );
