@@ -1,4 +1,4 @@
-import { auth } from "../firebase";
+import { auth } from "../firebase/firebase";
 
 export default function Home() {
   const logOut = () => {

@@ -5,9 +5,10 @@ import {
 } from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components";
-import { auth } from "../firebase";
+import { auth } from "../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
+import GithubBtn from "../components/GithubBtn";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -116,6 +117,7 @@ export default function Login({}: Props) {
         아이디가 없으면
         <Link to="/register"> 아이디 생성하기</Link>
       </Switcher>
+      <GithubBtn />
     </Wrapper>
   );
 }

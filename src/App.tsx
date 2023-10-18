@@ -8,7 +8,7 @@ import reset from "styled-reset";
 import Register from "./routes/Register";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/LoadingScreen";
-import { auth } from "./firebase";
+import { auth } from "./firebase/firebase";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const Wrapper = styled.div`
