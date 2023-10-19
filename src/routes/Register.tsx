@@ -112,7 +112,7 @@ export default function Register() {
 
   return (
     <Wrapper>
-      <Title>Log into ✖</Title>
+      <Title>Join ✖</Title>
       <Form onSubmit={handleSubmit}>
         {fields.map((field, index) => (
           <div key={index}>

@@ -1,8 +1,4 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components";
 import { auth } from "../firebase/firebase";
@@ -53,37 +49,45 @@ const Switcher = styled.span`
     text-decoration: none;
   }
 `;
-type Props = {};
+type FormData = {
+  email: string;
+  password: string;
+  error: string;
+};
 
-export default function Login({}: Props) {
+// 입력 필드 정보를 배열로 선언
+const fields = [
+  { type: "email", name: "email", placeholder: "이메일", label: "Email" },
+  { type: "password", name: "password", placeholder: "비밀번호", label: "Password" },
+];
+
+export default function Login() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+    error: "",
+  });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { name, value },
     } = e;
-    if (name === "password") {
-      setPassword(value);
-    } else if (name === "email") {
-      setEmail(value);
-    }
+    setFormData({ ...formData, [name]: value, error: "" });
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isLoading || email === "" || password === "") return;
+    if (isLoading || formData.email === "" || formData.password === "") return;
     try {
       setIsLoading(true);
-      setError("");
-      await signInWithEmailAndPassword(auth, email, password);
+      setFormData({ ...formData, error: "" });
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       navigate("/");
     } catch (e) {
       if (e instanceof FirebaseError) {
-        setError(e.message);
+        setFormData({ ...formData, error: "" });
       }
     } finally {
       setIsLoading(false);
@@ -94,25 +98,21 @@ export default function Login({}: Props) {
     <Wrapper>
       <Title>Log into ✖</Title>
       <Form onSubmit={onSubmit}>
-        <Input
-          onChange={onChange}
-          type="email"
-          value={email}
-          name="email"
-          placeholder="이메일"
-          required
-        />
-        <Input
-          onChange={onChange}
-          type="password"
-          value={password}
-          name="password"
-          placeholder="비밀번호"
-          required
-        />
-        <Input type="submit" value={isLoading ? "Loading..." : "Create Account"} />
+        {fields.map((field, index) => (
+          <div key={index}>
+            <label htmlFor={field.name}>{field.label}</label>
+            <Input
+              onChange={onChange}
+              type={field.type}
+              value={field.name}
+              name={field.name}
+              placeholder={field.placeholder}
+              required
+            />
+          </div>
+        ))}
       </Form>
-      {error !== "" ? <Error>{error}</Error> : ""}
+      {formData.error !== "" ? <Error>{formData.error}</Error> : ""}
       <Switcher>
         아이디가 없으면
         <Link to="/register"> 아이디 생성하기</Link>
