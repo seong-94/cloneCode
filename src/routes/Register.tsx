@@ -93,9 +93,7 @@ export default function Register() {
     try {
       setIsLoading(true);
       setFormData({ ...formData, error: "" });
-
       const credentials = await createUserWithEmailAndPassword(auth, email, password);
-
       await updateProfile(credentials.user, {
         displayName: name,
       });

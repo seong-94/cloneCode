@@ -1,12 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/firebase";
 
 export default function Home() {
-  const logOut = () => {
-    auth.signOut();
-  };
-  return (
-    <div>
-      <button onClick={logOut}>로그아웃</button>
-    </div>
-  );
+  const navigate = useNavigate();
+
+  return <div></div>;
 }

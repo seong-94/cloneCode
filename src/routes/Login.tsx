@@ -104,13 +104,14 @@ export default function Login() {
             <Input
               onChange={onChange}
               type={field.type}
-              value={field.name}
+              value={formData[field.name as keyof FormData]}
               name={field.name}
               placeholder={field.placeholder}
               required
             />
           </div>
         ))}
+        <Input type="submit" value={isLoading ? "Loading..." : "Login"} />
       </Form>
       {formData.error !== "" ? <Error>{formData.error}</Error> : ""}
       <Switcher>
