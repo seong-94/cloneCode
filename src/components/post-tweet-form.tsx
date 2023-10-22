@@ -13,9 +13,8 @@ export default function PostTweetForm({}: Props) {
     <Form>
       <TextArea placeholder="what is Happening" />
       <FileButton htmlFor="file">사진 업로드 </FileButton>
-      <FileInput id="file" accept="image/*">
-        사진 업로드
-      </FileInput>
+      <FileInput id="file" accept="image/*" />
+      사진 업로드
       <SubmitButton />
     </Form>
   );
